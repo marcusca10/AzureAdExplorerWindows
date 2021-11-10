@@ -17,12 +17,17 @@ namespace AzureAdExplorerWindows.ViewModels
 
         string loginText;
         string resultText;
+        int selectedAuthMode;
+        List<string> authModeList;
 
         public IRelayCommand LoginCommand { get; }
 
         public MainViewModel(IAuthenticationService authenticationService)
         {
             this._authenticationService = authenticationService;
+
+            authModeList = new List<string>() { "System browser", "Integrated", "WAM" };
+            SelectedAuthMode = "System browser";
 
             UpdateSignInState();
 
@@ -41,15 +46,32 @@ namespace AzureAdExplorerWindows.ViewModels
             set => SetProperty(ref resultText, value);
         }
 
+        public string SelectedAuthMode
+        {
+            get => authModeList[selectedAuthMode];
+            set => SetProperty(ref selectedAuthMode, authModeList.IndexOf(value));
+        }
+
+        public List<string> AuthModeList
+        {
+            get => authModeList;
+        }
+
         private async void OnLoginClicked()
         {
             try
             {
                 if (!this._authenticationService.UserContext.IsLoggedOn)
                 {
-                    //this._authenticationService.UseBroker = true;
-                    //await this._authenticationService.SignInAsync(useIwa: true);
-                    await this._authenticationService.SignInAsync();
+                    if (selectedAuthMode == 2)
+                        this._authenticationService.UseBroker = true;
+                    else
+                        this._authenticationService.UseBroker = false;
+
+                    if (selectedAuthMode == 1)
+                        await this._authenticationService.SignInAsync(useIwa: true);
+                    else
+                        await this._authenticationService.SignInAsync();
 
                     UpdateSignInState();
                 }

@@ -7,8 +7,8 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Button Content="{Binding LoginText}" Margin="10,10,0,0" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="103" Command="{Binding Path=LoginCommand}"/>
+        <ComboBox HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="120" ItemsSource="{Binding AuthModeList}" SelectedValue="{Binding SelectedAuthMode}"/>
+        <Button Content="{Binding LoginText}" Margin="192,10,0,0" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="103" Command="{Binding Path=LoginCommand}"/>
         <TextBox Margin="10,65,10,10" Text="{Binding ResultText}" TextWrapping="Wrap"/>
-
     </Grid>
 </Window>
