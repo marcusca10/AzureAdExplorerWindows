@@ -1,4 +1,6 @@
-﻿using AzureAdExplorerWindows.ViewModels;
+﻿using AzureAdExplorerWindows.Services;
+using AzureAdExplorerWindows.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +26,7 @@ namespace AzureAdExplorerWindows
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainViewModel();
+            DataContext = App.Current.Services.GetService<MainViewModel>();
         }
     }
 }
