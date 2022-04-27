@@ -11,7 +11,7 @@ namespace AzureAdExplorerWindows.Services
     {
         UserContext UserContext { get; set; }
         bool UseBroker { get; set; }
-        Task SignInAsync(bool useIwa = false);
+        Task SignInAsync(bool useWebView = true, bool useIwa = false);
         Task SignOutAsync();
     }
 }

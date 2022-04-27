@@ -26,8 +26,8 @@ namespace AzureAdExplorerWindows.ViewModels
         {
             this._authenticationService = authenticationService;
 
-            authModeList = new List<string>() { "System browser", "Integrated", "WAM" };
-            SelectedAuthMode = "System browser";
+            authModeList = new List<string>() { "Embedded browser", "System browser", "Integrated", "WAM" };
+            SelectedAuthMode = "Embedded browser";
 
             UpdateSignInState();
 
@@ -63,13 +63,15 @@ namespace AzureAdExplorerWindows.ViewModels
             {
                 if (!this._authenticationService.UserContext.IsLoggedOn)
                 {
-                    if (selectedAuthMode == 2)
+                    if (selectedAuthMode == 3)
                         this._authenticationService.UseBroker = true;
                     else
                         this._authenticationService.UseBroker = false;
 
-                    if (selectedAuthMode == 1)
+                    if (selectedAuthMode == 2)
                         await this._authenticationService.SignInAsync(useIwa: true);
+                    else if (selectedAuthMode == 1)
+                        await this._authenticationService.SignInAsync(false);
                     else
                         await this._authenticationService.SignInAsync();
 

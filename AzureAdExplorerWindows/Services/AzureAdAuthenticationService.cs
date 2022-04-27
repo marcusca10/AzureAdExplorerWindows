@@ -40,13 +40,15 @@ namespace AzureAdExplorerWindows.Services
             }
         }
 
-        public void BuildClientApplication(bool useBroker)
+        public void BuildClientApplication(bool useBroker, string redirectUri = null)
         {
-            // default redirectURI; each platform specific project will have to override it with its own
             var builder = PublicClientApplicationBuilder.Create(AzureAdConstants.ClientID)
                 .WithLogging(Log, LogLevel.Error, true)
-                .WithAuthority(AzureAdConstants.Authority)
-                .WithDefaultRedirectUri();
+                .WithAuthority(AzureAdConstants.Authority);
+
+            // redirectUri is different if using embedded/system browser
+            if (!string.IsNullOrEmpty(redirectUri))
+                builder.WithRedirectUri(redirectUri);
 
             // broker
             if (useBroker)
@@ -57,7 +59,7 @@ namespace AzureAdExplorerWindows.Services
             _pca = builder.Build();
         }
 
-        public async Task SignInAsync(bool useIwa)
+        public async Task SignInAsync(bool useWebView, bool useIwa)
         {
             UserContext newContext;
             try
@@ -68,7 +70,7 @@ namespace AzureAdExplorerWindows.Services
             catch (MsalUiRequiredException)
             {
                 // acquire token interactive
-                newContext = await SignInInteractively();
+                newContext = await SignInInteractively(useWebView);
             }
 
             UserContext = newContext;
@@ -98,9 +100,23 @@ namespace AzureAdExplorerWindows.Services
             return newContext;
         }
 
-        private async Task<UserContext> SignInInteractively()
+        private async Task<UserContext> SignInInteractively(bool useWebView)
         {
-            AuthenticationResult authResult = await _pca.AcquireTokenInteractive(AzureAdConstants.Scopes).ExecuteAsync();
+            AuthenticationResult authResult;
+
+            if (useWebView)
+            {
+                BuildClientApplication(false, AzureAdConstants.EmbeddedRedirectUri);
+                authResult = await _pca.AcquireTokenInteractive(AzureAdConstants.Scopes)
+                    .ExecuteAsync();
+            }
+            else
+            {
+                BuildClientApplication(false, AzureAdConstants.SystemRedirectUri);
+                authResult = await _pca.AcquireTokenInteractive(AzureAdConstants.Scopes)
+                    .WithUseEmbeddedWebView(false)
+                    .ExecuteAsync();
+            }
 
             var newContext = UpdateUserInfo(authResult);
             return newContext;
